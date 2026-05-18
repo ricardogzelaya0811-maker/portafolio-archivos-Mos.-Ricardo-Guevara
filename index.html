@@ -1,5 +1,4 @@
- <!DOCTYPE html>
->>>>>>> 7c9c7b277ea61256f9b7ec4a831af2002d7c52bc
+te doy el html que tengo y ve adonde esta eso o nose ayudam nose de programacion <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
@@ -635,356 +634,6 @@
 </div>
 
 <script>
-  ```html
-<!-- ✅ AGREGA ESTO ANTES DE TU <script> PRINCIPAL -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-
-/* ══════════════════════════════════════
-   SUPABASE
-══════════════════════════════════════ */
-
-const SUPABASE_URL = "https://mvzwipqnzeqvnbkkbshn.supabase.co";
-const SUPABASE_KEY = "sb_publishable_rC_MRTrw45InbL1FcTScKQ_wuR3PiBm";
-
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-
-/* ══════════════════════════════════════
-   REEMPLAZA TODO ESTO:
-
-   const KEY = 'mos_docs_v3';
-   let currentFilter = 'all';
-   let searchQuery   = '';
-
-   function getDocs() { ... }
-   function saveDocs(d) { ... }
-
-══════════════════════════════════════ */
-
-let currentFilter = 'all';
-let searchQuery = '';
-
-/* ══════════════════════════════════════
-   CARGAR DOCUMENTOS DESDE SUPABASE
-══════════════════════════════════════ */
-
-async function getDocs(){
-
-  const { data, error } = await supabase
-    .from('documentos')
-    .select('*')
-    .order('created_at', { ascending:false });
-
-  if(error){
-    console.log(error);
-    return [];
-  }
-
-  return data || [];
-}
-
-/* ══════════════════════════════════════
-   ESTADÍSTICAS HERO
-══════════════════════════════════════ */
-
-async function updateHeroStats() {
-
-  const docs = await getDocs();
-
-  const w = docs.filter(d => d.tipo === 'word').length;
-  const e = docs.filter(d => d.tipo === 'excel').length;
-
-  document.getElementById('hTotal').textContent = docs.length;
-  document.getElementById('hWord').textContent  = w;
-  document.getElementById('hExcel').textContent = e;
-}
-
-/* ══════════════════════════════════════
-   BUSCADOR
-══════════════════════════════════════ */
-
-function searchDocs() {
-  searchQuery = document.getElementById('searchInput').value.toLowerCase();
-  renderDocs();
-}
-
-/* ══════════════════════════════════════
-   RENDER DOCUMENTOS
-══════════════════════════════════════ */
-
-async function renderDocs() {
-
-  let docs = await getDocs();
-
-  const w = docs.filter(d => d.tipo === 'word').length;
-  const e = docs.filter(d => d.tipo === 'excel').length;
-
-  document.getElementById('dlAll').textContent = docs.length;
-  document.getElementById('dlWord').textContent = w;
-  document.getElementById('dlExcel').textContent = e;
-
-  if(currentFilter !== 'all'){
-    docs = docs.filter(d => d.tipo === currentFilter);
-  }
-
-  if(searchQuery){
-    docs = docs.filter(d =>
-      d.titulo.toLowerCase().includes(searchQuery) ||
-      (d.descripcion || '').toLowerCase().includes(searchQuery) ||
-      d.autor.toLowerCase().includes(searchQuery)
-    );
-  }
-
-  const grid = document.getElementById('dlGrid');
-
-  if(!docs.length){
-
-    grid.innerHTML = `
-      <div class="dl-empty">
-        <div class="big">📂</div>
-        <p>No hay documentos todavía.</p>
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML = docs.map((d,i) => `
-
-    <div class="doc-card">
-
-      <div class="doc-thumb ${d.tipo}"
-        onclick="previewDoc(
-          '${d.id}',
-          '${d.titulo.replace(/'/g,"&#39;")}',
-          '${d.tipo}',
-          '${d.url}'
-        )">
-
-        <span>${d.tipo === 'word' ? '📄' : '📊'}</span>
-
-        <div class="doc-thumb-overlay">
-          👁️ Vista previa
-        </div>
-
-        <span class="doc-num">
-          ${d.tipo === 'word' ? 'W' : 'E'}${String(i+1).padStart(2,'0')}
-        </span>
-
-      </div>
-
-      <div class="doc-body">
-
-        <span class="doc-tag ${d.tipo}">
-          ${d.tipo === 'word'
-            ? '● Microsoft Word'
-            : '● Microsoft Excel'}
-        </span>
-
-        <p class="doc-title">${d.titulo}</p>
-
-        <p class="doc-desc">
-          ${d.descripcion || ''}
-        </p>
-
-        <div class="doc-author">
-          👤 ${d.autor}
-        </div>
-
-      </div>
-
-      <div class="doc-foot">
-
-        <a class="btn-dl"
-          href="${d.url}"
-          target="_blank">
-
-          ↓ Descargar
-
-        </a>
-
-        <button class="btn-del"
-          onclick="deleteDoc('${d.id}','${d.archivo}')">
-
-          🗑️
-
-        </button>
-
-      </div>
-
-    </div>
-
-  `).join('');
-}
-
-/* ══════════════════════════════════════
-   FILTROS
-══════════════════════════════════════ */
-
-function filterDl(type, btn) {
-
-  currentFilter = type;
-
-  document.querySelectorAll('.dl-tab')
-    .forEach(b => b.classList.remove('active'));
-
-  btn.classList.add('active');
-
-  renderDocs();
-}
-
-/* ══════════════════════════════════════
-   ELIMINAR DOCUMENTO
-══════════════════════════════════════ */
-
-async function deleteDoc(id, archivo){
-
-  if(!confirm('¿Eliminar documento?')){
-    return;
-  }
-
-  // BORRAR ARCHIVO STORAGE
-  await supabase.storage
-    .from('documentos')
-    .remove([archivo]);
-
-  // BORRAR DB
-  await supabase
-    .from('documentos')
-    .delete()
-    .eq('id', id);
-
-  renderDocs();
-  updateHeroStats();
-}
-
-/* ══════════════════════════════════════
-   SUBIR ARCHIVO
-══════════════════════════════════════ */
-
-async function uploadDoc(){
-
-  const autor = document.getElementById('upAutor').value.trim();
-  const tipo = document.getElementById('upTipo').value;
-  const titulo = document.getElementById('upTitulo').value.trim();
-  const desc = document.getElementById('upDesc').value.trim();
-
-  if(!selectedFile){
-    alert('Selecciona un archivo');
-    return;
-  }
-
-  if(!autor){
-    alert('Escribe autor');
-    return;
-  }
-
-  if(!tipo){
-    alert('Selecciona tipo');
-    return;
-  }
-
-  if(!titulo){
-    alert('Escribe título');
-    return;
-  }
-
-  const fileName =
-    Date.now() + "_" + selectedFile.name;
-
-  // SUBIR STORAGE
-
-  const { error: uploadError } =
-    await supabase.storage
-      .from('documentos')
-      .upload(fileName, selectedFile);
-
-  if(uploadError){
-
-    console.log(uploadError);
-
-    alert('Error subiendo archivo');
-
-    return;
-  }
-
-  // URL PÚBLICA
-
-  const { data: publicData } =
-    supabase.storage
-      .from('documentos')
-      .getPublicUrl(fileName);
-
-  const publicURL = publicData.publicUrl;
-
-  // GUARDAR DB
-
-  const { error: dbError } =
-    await supabase
-      .from('documentos')
-      .insert([
-        {
-          titulo: titulo,
-          autor: autor,
-          descripcion: desc,
-          tipo: tipo,
-          archivo: fileName,
-          url: publicURL
-        }
-      ]);
-
-  if(dbError){
-
-    console.log(dbError);
-
-    alert('Error guardando');
-
-    return;
-  }
-
-  document.getElementById('uploadForm').style.display = 'none';
-  document.getElementById('uploadOk').style.display = 'block';
-
-  renderDocs();
-  updateHeroStats();
-}
-
-/* ══════════════════════════════════════
-   LOGIN
-══════════════════════════════════════ */
-
-function doLogin() {
-
-  const v = document.getElementById('loginPass').value;
-  const e = document.getElementById('loginErr');
-
-  if(v === PASSWORD){
-
-    document.getElementById('loginScreen').style.display = 'none';
-
-    document.getElementById('app').style.display = 'block';
-
-    e.style.display = 'none';
-
-    renderDocs();
-    updateHeroStats();
-    initReveal();
-
-  } else {
-
-    e.style.display = 'block';
-
-    document.getElementById('loginPass').value = '';
-
-    document.getElementById('loginPass').focus();
-  }
-}
-```
-
 /* ══════════════════════════════════════
    CONTRASEÑA — cámbiala aquí ↓
 ══════════════════════════════════════ */
@@ -1097,10 +746,10 @@ async function getDocs() {
     emoji: d.tipo === 'word' ? '📝' : '📊'
   }));
 }
-function saveDocs(d) {}
+function saveDocs() {}
 
 async function updateHeroStats() {
-  const docs = await getDocs();
+ const docs = await getDocs();
   const w = docs.filter(d=>d.type==='word').length;
   const e = docs.filter(d=>d.type==='excel').length;
   document.getElementById('hTotal').textContent = docs.length;
@@ -1114,7 +763,7 @@ function searchDocs() {
 }
 
 async function renderDocs() {
-  let docs = await getDocs();
+ let docs = await getDocs();
   const w = docs.filter(d=>d.type==='word').length;
   const e = docs.filter(d=>d.type==='excel').length;
   document.getElementById('dlAll').textContent   = docs.length;
@@ -1248,8 +897,7 @@ async function uploadDoc(){
     alert('Error subiendo archivo');
     return;
   }
-
-  const { data: publicData } = supabaseClient.storage
+ const { data: publicData } = supabaseClient.storage
     .from('documentos')
     .getPublicUrl(fileName);
 
@@ -1272,8 +920,7 @@ async function uploadDoc(){
     alert('Error guardando en base de datos');
     return;
   }
-
-  document.getElementById('uploadForm').style.display='none';
+ document.getElementById('uploadForm').style.display='none';
   document.getElementById('uploadOk').style.display='block';
 
   renderDocs();
@@ -1329,7 +976,8 @@ function initReveal(){
   document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</body>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 const SUPABASE_URL = 'https://mvzwipqnzeqvnbkkbshn.supabase.co';
@@ -1337,5 +985,4 @@ const SUPABASE_KEY = 'sb_publishable_rC_MRTrw45InbL1FcTScKQ_wuR3PiBm';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 </script>
-</body>
 </html>

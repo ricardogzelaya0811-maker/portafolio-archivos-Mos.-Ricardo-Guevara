@@ -890,7 +890,9 @@ async function uploadDoc(){
 
   const { error: uploadError } = await supabaseClient.storage
     .from('documentos')
-    .upload(fileName, selectedFile);
+    .upload(fileName, selectedFile, {
+  upsert: true
+});
 
   if(uploadError){
     console.error(uploadError);

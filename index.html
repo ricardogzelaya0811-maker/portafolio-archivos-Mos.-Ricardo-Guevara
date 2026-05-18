@@ -1,4 +1,5 @@
  <!DOCTYPE html>
+>>>>>>> 7c9c7b277ea61256f9b7ec4a831af2002d7c52bc
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
@@ -1074,16 +1075,32 @@ const KEY = 'mos_docs_v3';
 let currentFilter = 'all';
 let searchQuery   = '';
 
-function getDocs() {
-  try { return JSON.parse(localStorage.getItem(KEY)) || []; }
-  catch(e) { return []; }
-}
-function saveDocs(d) {
-  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e) {}
-}
+async function getDocs() {
+  const { data, error } = await supabaseClient
+    .from('documentos')
+    .select('*')
+    .order('id', { ascending: false });
 
-function updateHeroStats() {
-  const docs = getDocs();
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data.map(d => ({
+    id: d.id,
+    titulo: d.titulo,
+    desc: d.descripcion,
+    autor: d.autor,
+    type: d.tipo,
+    file: d.archivo,
+    url: d.archivo,
+    emoji: d.tipo === 'word' ? '📝' : '📊'
+  }));
+}
+function saveDocs(d) {}
+
+async function updateHeroStats() {
+  const docs = await getDocs();
   const w = docs.filter(d=>d.type==='word').length;
   const e = docs.filter(d=>d.type==='excel').length;
   document.getElementById('hTotal').textContent = docs.length;
@@ -1096,8 +1113,8 @@ function searchDocs() {
   renderDocs();
 }
 
-function renderDocs() {
-  let docs = getDocs();
+async function renderDocs() {
+  let docs = await getDocs();
   const w = docs.filter(d=>d.type==='word').length;
   const e = docs.filter(d=>d.type==='excel').length;
   document.getElementById('dlAll').textContent   = docs.length;
@@ -1150,10 +1167,22 @@ function filterDl(type, btn) {
   renderDocs();
 }
 
-function deleteDoc(id) {
-  if (!confirm('¿Eliminar este documento? Esta acción no se puede deshacer.')) return;
-  saveDocs(getDocs().filter(d=>d.id!==id));
-  renderDocs(); updateHeroStats();
+async function deleteDoc(id) {
+  if (!confirm('¿Eliminar este documento?')) return;
+
+  const { error } = await supabaseClient
+    .from('documentos')
+    .delete()
+    .eq('id', id);
+
+  if(error){
+    console.error(error);
+    alert('Error eliminando');
+    return;
+  }
+
+  renderDocs();
+  updateHeroStats();
 }
 
 /* ── VISTA PREVIA ── */
@@ -1197,23 +1226,57 @@ function setFile(f){
   if(f.name.endsWith('.docx')) document.getElementById('upTipo').value='word';
   if(f.name.endsWith('.xlsx')) document.getElementById('upTipo').value='excel';
 }
-function uploadDoc(){
-  const autor =document.getElementById('upAutor').value.trim();
-  const tipo  =document.getElementById('upTipo').value;
-  const titulo=document.getElementById('upTitulo').value.trim();
-  const desc  =document.getElementById('upDesc').value.trim();
+async function uploadDoc(){
+  const autor = document.getElementById('upAutor').value.trim();
+  const tipo = document.getElementById('upTipo').value;
+  const titulo = document.getElementById('upTitulo').value.trim();
+  const desc = document.getElementById('upDesc').value.trim();
+
   if(!selectedFile){alert('Selecciona un archivo primero.');return}
-  if(!autor) {alert('Escribe el nombre del autor.');return}
-  if(!tipo)  {alert('Selecciona el tipo de documento.');return}
+  if(!autor){alert('Escribe el nombre del autor.');return}
+  if(!tipo){alert('Selecciona el tipo de documento.');return}
   if(!titulo){alert('Escribe un título.');return}
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const doc={id:'u_'+Date.now(),type:tipo,emoji:tipo==='word'?'📝':'📊',titulo,desc:desc||'Subido por '+autor,autor,file:selectedFile.name,url:e.target.result};
-    const docs=getDocs(); docs.push(doc); saveDocs(docs); updateHeroStats();
-    document.getElementById('uploadForm').style.display='none';
-    document.getElementById('uploadOk').style.display='block';
-  };
-  reader.readAsDataURL(selectedFile);
+
+  const fileName = Date.now() + '_' + selectedFile.name;
+
+  const { error: uploadError } = await supabaseClient.storage
+    .from('documentos')
+    .upload(fileName, selectedFile);
+
+  if(uploadError){
+    console.error(uploadError);
+    alert('Error subiendo archivo');
+    return;
+  }
+
+  const { data: publicData } = supabaseClient.storage
+    .from('documentos')
+    .getPublicUrl(fileName);
+
+  const fileUrl = publicData.publicUrl;
+
+  const { error: dbError } = await supabaseClient
+    .from('documentos')
+    .insert([
+      {
+        titulo,
+        descripcion: desc,
+        autor,
+        tipo,
+        archivo: fileUrl
+      }
+    ]);
+
+  if(dbError){
+    console.error(dbError);
+    alert('Error guardando en base de datos');
+    return;
+  }
+
+  document.getElementById('uploadForm').style.display='none';
+  document.getElementById('uploadOk').style.display='block';
+
+  renderDocs();
 }
 function resetUpload(){
   selectedFile=null;
@@ -1265,6 +1328,14 @@ function initReveal(){
   const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1});
   document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = 'https://mvzwipqnzeqvnbkkbshn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_rC_MRTrw45InbL1FcTScKQ_wuR3PiBm';
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 </script>
 </body>
 </html>

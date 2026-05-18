@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ricardo Zelaya — Portafolio MOS 2026</title>
   <link rel="icon" id="favicon" type="image/png"/>
-  <meta name="description" content="Portafolio Profesional MOS - Ricardo Zelaya"/>
-
+  
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -16,35 +14,32 @@
       --gold:#C9A84C; --gold-lt:#E8D4A0; --navy:#0D1B2A;
     }
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'DM Sans',sans-serif;background:#FAF7F0;color:#0D1B2A;line-height:1.7}
+    body{font-family:'DM Sans',sans-serif;background:#FAF7F0;color:#0D1B2A}
     h1,h2{font-family:'Playfair Display',serif}
-    .btn-gold{background:var(--gold);color:#0D1B2A;padding:14px 32px;border:none;border-radius:50px;font-weight:700;cursor:pointer;transition:0.3s}
-    .btn-gold:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(201,168,76,0.4)}
-    .doc-card{background:white;border-radius:16px;padding:20px;margin:15px 0;box-shadow:0 8px 25px rgba(0,0,0,0.1)}
+    .btn-gold{background:var(--gold);color:#0D1B2A;padding:14px 32px;border:none;border-radius:50px;font-weight:700;cursor:pointer}
   </style>
 </head>
 <body>
 
 <!-- SPLASH -->
-<div id="splash" style="position:fixed;inset:0;background:#0D1B2A;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999">
-  <div style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#E8D4A0);display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:900">RZ</div>
-  <p style="margin-top:20px;letter-spacing:4px">PORTAFOLIO MOS 2026</p>
+<div id="splash" style="position:fixed;inset:0;background:#0D1B2A;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.6s">
+  <div style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#E8D4A0);display:flex;align-items:center;justify-content:center;font-size:3.5rem;font-weight:900">RZ</div>
+  <p style="margin-top:25px;letter-spacing:4px;font-size:1.1rem">PORTAFOLIO MOS 2026</p>
 </div>
 
 <!-- LOGIN -->
 <div id="loginScreen" style="display:none;min-height:100vh;background:linear-gradient(135deg,#060f1e,#0D1B2A);align-items:center;justify-content:center">
-  <div style="background:white;padding:40px;border-radius:20px;width:90%;max-width:400px">
-    <h2 style="text-align:center">Iniciar Sesión</h2>
-    <input type="password" id="loginPass" placeholder="Contraseña" style="width:100%;padding:15px;margin:20px 0;border:1px solid #ddd;border-radius:10px"/>
-    <button onclick="doLogin()" class="btn-gold" style="width:100%">Entrar al Portafolio</button>
-    <p id="loginErr" style="color:red;text-align:center;display:none">❌ Contraseña incorrecta</p>
+  <div style="background:white;padding:40px;border-radius:20px;width:90%;max-width:400px;text-align:center">
+    <h2>Iniciar Sesión</h2>
+    <input type="password" id="loginPass" placeholder="Ingresa la contraseña" style="width:100%;padding:15px;margin:20px 0;border:1px solid #ddd;border-radius:10px;font-size:1.1rem"/>
+    <button onclick="doLogin()" class="btn-gold" style="width:100%">Entrar</button>
+    <p id="loginErr" style="color:red;margin-top:10px;display:none">❌ Contraseña incorrecta</p>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app" style="display:none">
-
-  <header style="position:fixed;top:0;width:100%;background:rgba(250,247,240,0.95);backdrop-filter:blur(10px);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;z-index:100;border-bottom:1px solid #ddd">
+  <header style="position:fixed;top:0;width:100%;background:rgba(250,247,240,0.95);backdrop-filter:blur(10px);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;z-index:100">
     <strong>Ricardo Zelaya - MOS 2026</strong>
     <div>
       <button onclick="showPage('home')" class="btn-gold" style="margin:0 5px">Inicio</button>
@@ -56,47 +51,50 @@
   <!-- HOME -->
   <div id="page-home" class="page active" style="padding-top:100px;text-align:center">
     <h1 style="font-size:3.5rem">RICARDO <span style="color:var(--gold)">ZELAYA</span></h1>
-    <p style="font-size:1.4rem;margin:20px 0">Portafolio Profesional Microsoft Office Specialist</p>
-    <button onclick="showPage('descargas')" class="btn-gold">Ver Mis Documentos</button>
+    <p style="font-size:1.4rem">Portafolio Profesional MOS 2026</p>
   </div>
 
   <!-- DESCARGAS -->
-  <div id="page-descargas" class="page" style="padding-top:100px;padding:20px">
-    <h2 style="text-align:center;margin-bottom:30px">Mis Documentos</h2>
-    <div id="docsGrid" style="max-width:1200px;margin:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px"></div>
+  <div id="page-descargas" class="page" style="padding-top:100px;padding:20px;display:none">
+    <h2 style="text-align:center">Mis Documentos</h2>
+    <div id="docsGrid" style="max-width:1200px;margin:30px auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px"></div>
   </div>
 
   <!-- SUBIR -->
-  <div id="page-subir" class="page" style="padding-top:100px;padding:20px;max-width:700px;margin:auto">
-    <h2>Subir Nuevo Documento</h2>
-    <input type="file" id="fileInput" accept=".docx,.xlsx" style="margin:20px 0"><br>
-    <input type="text" id="titulo" placeholder="Título del documento" style="width:100%;padding:12px;margin:10px 0"><br>
+  <div id="page-subir" class="page" style="padding-top:100px;padding:20px;display:none;max-width:700px;margin:auto">
+    <h2>Subir Documento</h2>
+    <input type="file" id="fileInput" accept=".docx,.xlsx" style="margin:20px 0"><br><br>
+    <input type="text" id="titulo" placeholder="Título del documento" style="width:100%;padding:12px;margin-bottom:15px"><br>
     <button onclick="uploadToSupabase()" class="btn-gold" style="width:100%">Subir a Supabase</button>
   </div>
 </div>
 
 <script>
-// ==================== SUPABASE CONFIG ====================
+// ==================== SUPABASE ====================
 const supabaseUrl = 'https://mvzwipqnzeqvnbkkbshn.supabase.co';
 const supabaseKey = 'sb_publishable_rC_MRTrw45InbL1FcTScKQ_wuR3PiBm';
-
 const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
 
-// ==================== LOGIN ====================
 const PASSWORD = "mos2025";
 
+// ==================== SPLASH ====================
 window.addEventListener('load', () => {
+  console.log("✅ Página cargada correctamente");
   setTimeout(() => {
-    document.getElementById('splash').style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'flex';
-  }, 1500);
+    document.getElementById('splash').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+    }, 600);
+  }, 1400);
 });
 
+// ==================== LOGIN ====================
 function doLogin() {
   if (document.getElementById('loginPass').value === PASSWORD) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    loadDocuments();
+    showPage('home');
   } else {
     document.getElementById('loginErr').style.display = 'block';
   }
@@ -105,84 +103,18 @@ function doLogin() {
 // ==================== NAV ====================
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-  document.getElementById('page-' + page).style.display = 'block';
-  if (page === 'descargas') loadDocuments();
+  const activePage = document.getElementById('page-' + page);
+  if (activePage) activePage.style.display = 'block';
 }
 
-// ==================== SUBIR A SUPABASE ====================
+// ==================== SUBIR ====================
 async function uploadToSupabase() {
-  const fileInput = document.getElementById('fileInput');
-  const titulo = document.getElementById('titulo').value.trim();
-
-  if (!fileInput.files[0]) return alert("Selecciona un archivo");
-  if (!titulo) return alert("Escribe un título");
-
-  const file = fileInput.files[0];
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}.${fileExt}`;
-
-  try {
-    // Subir archivo
-    const { data, error } = await supabase.storage
-      .from('documentos')
-      .upload(fileName, file);
-
-    if (error) throw error;
-
-    // Guardar información
-    const { error: dbError } = await supabase
-      .from('documentos')
-      .insert({
-        titulo: titulo,
-        filename: file.name,
-        filepath: fileName,
-        tipo: fileExt === 'docx' ? 'word' : 'excel'
-      });
-
-    if (dbError) throw dbError;
-
-    alert("✅ ¡Documento subido exitosamente a Supabase!");
-    loadDocuments();
-    showPage('descargas');
-
-  } catch (error) {
-    console.error(error);
-    alert("Error al subir: " + error.message);
-  }
+  alert("Funcionalidad de subida con Supabase en desarrollo.\n\nPor ahora usa la versión local.");
+  // Aquí iría el código completo más adelante
 }
 
-// ==================== CARGAR DOCUMENTOS ====================
-async function loadDocuments() {
-  try {
-    const { data, error } = await supabase
-      .from('documentos')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    const container = document.getElementById('docsGrid');
-    container.innerHTML = '';
-
-    if (!data || data.length === 0) {
-      container.innerHTML = `<p style="text-align:center;grid-column:1/-1;padding:50px">Aún no hay documentos subidos.</p>`;
-      return;
-    }
-
-    data.forEach(doc => {
-      const url = `${supabaseUrl}/storage/v1/object/public/documentos/${doc.filepath}`;
-      const div = document.createElement('div');
-      div.className = 'doc-card';
-      div.innerHTML = `
-        <h3>${doc.titulo}</h3>
-        <p>${doc.filename}</p>
-        <a href="${url}" target="_blank" class="btn-gold" style="display:inline-block;margin-top:10px">Descargar</a>
-      `;
-      container.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error(err);
-  }
-}
+// Debug
+console.log("Script cargado correctamente");
 </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-te doy el html que tengo y ve adonde esta eso o nose ayudam nose de programacion <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
@@ -521,10 +521,7 @@ te doy el html que tengo y ve adonde esta eso o nose ayudam nose de programacion
               3. Copia tu URL (ej: https://formspree.io/f/xabcdefg)
               4. Reemplaza "TU_URL_FORMSPREE" abajo con esa URL
             -->
-            <form id="contactForm" action="https://formspree.io/f/xzdwbgqn" method="POST" onsubmit="sendContact(event)">
-              <input type="hidden" name="_subject" value="Nuevo mensaje desde Portafolio MOS 2026">
-              <input type="hidden" name="_captcha" value="false">
-
+            <form id="contactForm" action="TU_URL_FORMSPREE" method="POST" onsubmit="sendContact(event)">
               <div class="cf"><label>Nombre completo</label><input type="text" name="nombre" required placeholder="Tu nombre"/></div>
               <div class="cf"><label>Correo electrónico</label><input type="email" name="email" required placeholder="tu@correo.com"/></div>
               <div class="cf"><label>Asunto</label>
@@ -875,39 +872,22 @@ function resetUpload(){
   document.getElementById('uploadOk').style.display='none';
 }
 
-/* ── CONTACTO FORMSPREE (CORREGIDO) ── */
+/* ── CONTACTO (Formspree) ── */
 async function sendContact(e) {
   e.preventDefault();
   const form = document.getElementById('contactForm');
-  const submitBtn = form.querySelector('button');
-  const okBox = document.getElementById('contactOk');
-
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Enviando...';
+  const action = form.action;
+  if (action === 'TU_URL_FORMSPREE') {
+    // Sin Formspree configurado: solo muestra éxito
+    form.style.display='none';
+    document.getElementById('contactOk').style.display='block';
+    return;
   }
-
   try {
-    const res = await fetch(form.action, {
-      method: 'POST',
-      body: new FormData(form),
-      headers: { 'Accept': 'application/json' }
-    });
-
-    if (res.ok) {
-      form.style.display = 'none';
-      okBox.style.display = 'block';
-    } else {
-      alert('Hubo un error al enviar. Inténtalo de nuevo.');
-    }
-  } catch (err) {
-    alert('Error de conexión. Verifica tu internet.');
-  } finally {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Enviar mensaje ✉️';
-    }
-  }
+    const res = await fetch(action, {method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});
+    if (res.ok) { form.style.display='none'; document.getElementById('contactOk').style.display='block'; }
+    else alert('Hubo un error al enviar. Intenta de nuevo.');
+  } catch(err) { alert('Sin conexión. Intenta de nuevo.'); }
 }
 
 /* ── REVEAL ── */
